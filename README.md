@@ -1,174 +1,58 @@
-Sistema de Saque em Node.js
-Este projeto é um sistema de saque implementado em Node.js utilizando Express. Ele permite que um valor solicitado seja dividido em cédulas disponíveis e retorna a quantidade de cada cédula necessária.
+<h1>Sistema de Saque em Node.js</h1>
 
-Estrutura do Projeto :
+<p>Este projeto é um sistema de saque implementado em Node.js utilizando Express. Ele permite que um valor solicitado seja dividido em cédulas disponíveis e retorna a quantidade de cada cédula necessária.</p>
 
-controllers/saqueController.ts: Controlador responsável por realizar o saque.
+<h2>Estrutura do Projeto</h2>
+<ul>
+  <li><code>controllers/saqueController.ts</code>: Controlador responsável por realizar o saque.</li>
+  <li><code>routes/saque.ts</code>: Define as rotas para o saque.</li>
+  <li><code>utils/calcularCedulas.ts</code>: Função utilitária para calcular a quantidade de cédulas necessárias para um dado valor.</li>
+  <li><code>src/app.ts</code>: Arquivo principal que configura e inicia o servidor Express.</li>
+  <li><code>test/saque.test.ts</code>: Testes automatizados para o endpoint de saque.</li>
+</ul>
 
-routes/saque.ts: Define as rotas para o saque.
+<h2>Dependências</h2>
+<ul>
+  <li>Node.js</li>
+  <li>Express</li>
+  <li>Chai (para asserções em testes)</li>
+  <li>Supertest (para testes de integração)</li>
+</ul>
 
-utils/calcularCedulas.ts: Função utilitária para calcular a quantidade de cédulas necessárias para um dado valor.
-
-src/app.ts: Arquivo principal que configura e inicia o servidor Express.
-
-test/saque.test.ts: Testes automatizados para o endpoint de saque.
-
-Dependências :
-Node.js 
-Express
-Chai (para asserções em testes)
-Supertest (para testes de integração)
-
-
-Instalação :
-Clone o repositório para a sua máquina local.
+<h2>⚙️ Instalação</h2>
+<p>Clone o repositório para a sua máquina local</p>
+<pre><code>
 sh
 Copiar código
-git clone <https://github.com/Lucastorrestoledocc/testeMorada.git>
+git clone https://github.com/Lucastorrestoledocc/testeMorada.git
+</code></pre>
 
-Navegue até o diretório do projeto.
+<p>Navegue até o diretório do projeto.</p>
+<pre><code>
 sh
 Copiar código
-cd nome-do-projeto
+cd testeMorada
+</code></pre>
 
-Instale as dependências do projeto.
-sh
-Copiar código
+<p>❗❗❗ Instale as dependências do projeto ❗❗❗</p>
+<pre><code>
 npm install
-Executando o Projeto
+</code></pre>
 
-Para iniciar o servidor, execute o seguinte comando:
+<h2>Executando o Projeto</h2>
+<p>Para iniciar o servidor, execute os seguintes comandos:</p>
+<pre><code>
 sh
 Copiar código
 npm start
-O servidor estará rodando na porta 3000. Você pode acessar o endpoint de saque em http://localhost:3000/api/saque.
+</code></pre>
+<p>O servidor estará rodando na porta 3000. Você pode acessar o endpoint de saque em <a href="http://localhost:3000/api/saque">http://localhost:3000/api/saque</a>.</p>
 
-Estrutura de Diretórios
-bash
-src
-├── controllers
-│   └── saqueController.ts
-├── routes
-│   └── saque.ts
-├── utils
-│   └── calcularCedulas.ts
-├── app.ts
-test
-└── saque.test.ts
-package.json
-tsconfig.json
+<h2>Testando o Endpoint</h2>
+<p>Use <code>curl</code> no terminal para testar o endpoint:</p>
+<pre><code>
+curl -X POST -H "Content-Type: application/json" -d '{"valor": 380}' http://localhost:3000/api/saque
+</code></pre>
 
-
-
-Lógica do Projeto:
-
-calcularCedulas.ts - Esta função calcula a quantidade de cada cédula necessária para um dado valor.
-ts
-Copiar código
-export const calcularCedulas = (valor: number) => {
-  const cedulas = [100, 50, 20, 10, 5, 2];
-  const resultado: { [key: number]: number } = {};
-
-  for (const cedula of cedulas) {
-    resultado[cedula] = Math.floor(valor / cedula);
-    valor %= cedula;
-  }
-
-  return resultado;
-};
-
-
-
-saqueController.ts - Controlador que lida com a lógica de saque. Verifica se o valor é válido e calcula a quantidade de cédulas necessárias.
-
-ts
-Copiar código
-import { Request, Response } from 'express';
-import { calcularCedulas } from '../utils/calcularCedulas';
-
-export const realizarSaque = (req: Request, res: Response) => {
-  const { valor } = req.body;
-  if (typeof valor !== 'number' || valor <= 0) {
-    return res.status(400).json({ error: 'Valor inválido para saque' });
-  }
-
-  const resultado = calcularCedulas(valor);
-  res.json(resultado);
-};
-
-
-saque.ts - Define a rota para o endpoint de saque.
-
-ts
-Copiar código
-import { Router } from 'express';
-import { realizarSaque } from '../controllers/saqueController';
-
-const router = Router();
-
-router.post('/', realizarSaque);
-
-export default router;
-
-app.ts - Configura e inicia o servidor Express.
-ts
-Copiar código
-import express from 'express';
-import saqueRouter from './routes/saque';
-
-const app = express();
-const port = 3000; 
-
-app.use(express.json()); 
-app.use('/api/saque', saqueRouter); 
-
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
-});
-
-export default app;
-
-
-saque.test.ts - Testes automatizados para o endpoint de saque.
-ts
-Copiar código
-import { expect } from 'chai';
-import request from 'supertest';
-import app from '../src/app'; // ajuste o caminho conforme necessário
-
-describe('POST /api/saque', () => {
-  it('deve retornar a quantidade correta de cédulas', async () => {
-    const res = await request(app)
-      .post('/api/saque')
-      .send({ valor: 380 });
-
-    expect(res.status).to.equal(200);
-    expect(res.body).to.deep.equal({
-      100: 3,
-      50: 1,
-      20: 1,
-      10: 1,
-      5: 0,
-      2: 0
-    });
-  });
-
-  it('deve retornar erro para valor inválido', async () => {
-    const res = await request(app)
-      .post('/api/saque')
-      .send({ valor: -50 });
-
-    expect(res.status).to.equal(400);
-    expect(res.body).to.have.property('error', 'Valor inválido para saque');
-  });
-});
-
-
-Executando Testes - Para executar os testes, use o comando:
-
-sh
-Copiar código
-npm test
-
-
-E isso, espero que gostem do projeto !
+<h2>Considerações Finais</h2>
+<p>Este projeto foi desenvolvido para simular um caixa eletrônico simples. A lógica foi otimizada para garantir a menor quantidade de cédulas possíveis para qualquer valor de saque permitido. Quaisquer dúvidas ou problemas, por favor, abra uma issue no repositório.</p>
